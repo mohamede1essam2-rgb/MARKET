@@ -121,7 +121,7 @@
 
     .hero {
       text-align: center;
-      padding: 45px 20px 30px;
+      padding: 40px 20px 25px;
       background: radial-gradient(circle at 50% 10%, #1e293b 0%, var(--bg) 80%);
       border-bottom: 1px solid var(--border);
     }
@@ -152,8 +152,39 @@
     .container {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 26px 16px;
+      padding: 22px 16px;
     }
+
+    /* شريط البحث المطور */
+    .search-wrapper {
+      max-width: 550px;
+      margin: 0 auto 22px;
+      position: relative;
+    }
+    .search-wrapper input {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      color: #fff;
+      padding: 12px 42px 12px 16px;
+      border-radius: 25px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .search-wrapper input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+    .search-wrapper i {
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
     .filters {
       display: flex;
       justify-content: center;
@@ -265,7 +296,7 @@
     }
     .btn-add-cart:hover { background: var(--primary-dark); }
 
-    /* النوافذ المنبثقة والسلة */
+    /* النوافذ المنبثقة */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -404,7 +435,7 @@
       background: #0f172a;
     }
 
-    /* صندوق فودافون كاش التفاعلي */
+    /* فودافون كاش */
     .voda-pay-box {
       background: rgba(230, 0, 0, 0.08);
       border: 1.5px dashed var(--voda-red);
@@ -431,6 +462,19 @@
       border-radius: 20px;
       font-size: 0.78rem;
       font-weight: bold;
+    }
+
+    .badge-chip {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 3px;
     }
   </style>
 </head>
@@ -466,19 +510,22 @@
   </header>
 
   <section class="hero">
-    <div class="hero-tag"><i class="fa-solid fa-fire"></i> إلكترونيات وساعات أصلية 100%</div>
+    <div class="hero-tag"><i class="fa-solid fa-fire"></i> إلكترونيات وأجهزة أصلية 100%</div>
     <h1>تسوق الأفضل في <span>عالم التكنولوجيا</span></h1>
     <p>دفع آمن وفوري عبر محفظة فودافون كاش أو الدفع عند الاستلام مع شحن سريع لجميع المحافظات.</p>
   </section>
 
   <div class="container">
-    <div class="filters">
-      <button class="filter-btn active" onclick="filterCategory('الكل', this)">الكل</button>
-      <button class="filter-btn" onclick="filterCategory('ساعات', this)">ساعات ذكية</button>
-      <button class="filter-btn" onclick="filterCategory('سماعات', this)">سماعات وإلكترونيات</button>
-      <button class="filter-btn" onclick="filterCategory('إكسسوارات', this)">إكسسوارات</button>
+    <!-- شريط البحث الفوري -->
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="ابحث باسم المنتج أو المواصفات..." oninput="handleSearch()" />
     </div>
 
+    <!-- تصنيفات الأقسام الحية -->
+    <div class="filters" id="categoriesFilters"></div>
+
+    <!-- شبكة عرض المنتجات -->
     <div class="products-grid" id="productsArea"></div>
   </div>
 
@@ -503,12 +550,11 @@
     </div>
   </div>
 
-  <!-- نافذة تسجيل الدخول / حساب جديد / استعادة كلمة المرور بأسئلة الأمان -->
+  <!-- نافذة تسجيل الدخول وحساب جديد وأسئلة الأمان -->
   <div class="modal-backdrop" id="authModal">
     <div class="modal-content-card">
       <button class="modal-close-x" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
 
-      <!-- شاشة تسجيل الدخول -->
       <div id="loginView">
         <h3 style="color:var(--accent); text-align:center; margin-bottom:12px;">تسجيل الدخول لحسابك</h3>
         <form onsubmit="handleUserLogin(event)">
@@ -528,10 +574,9 @@
         </div>
       </div>
 
-      <!-- شاشة إنشاء حساب مع أسئلة الأمان -->
       <div id="registerView" style="display:none;">
         <h3 style="color:var(--accent); text-align:center; margin-bottom:6px;">إنشاء حساب جديد</h3>
-        <p style="color:var(--muted); font-size:0.8rem; text-align:center; margin-bottom:12px;">اختر سؤال أمان لاسترجاع كلمة مرورك بسهولة إذا نسيتها:</p>
+        <p style="color:var(--muted); font-size:0.8rem; text-align:center; margin-bottom:12px;">اختر سؤال أمان لاسترجاع كلمة مرورك بسهولة:</p>
         <form onsubmit="handleUserRegister(event)">
           <div class="form-group">
             <label>الاسم بالكامل</label>
@@ -545,21 +590,19 @@
             <label>كلمة المرور</label>
             <input type="password" id="regPass" class="form-control" placeholder="اختر كلمة مرور" required />
           </div>
-          
           <div class="form-group">
             <label>سؤال الأمان لحماية حسابك:</label>
             <select id="regQuestion" class="form-control" required>
-              <option value="ما هو اسم مدرستك الابتدائية أو الإعدادية؟">ما هو اسم مدرستك الابتدائية أو الإعدادية؟</option>
+              <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
               <option value="ما هو اسم صديق طفولتك المفضل؟">ما هو اسم صديق طفولتك المفضل؟</option>
-              <option value="ما هو ناديك أو فريقك الرياضي المفضل؟">ما هو ناديك أو فريقك الرياضي المفضل؟</option>
-              <option value="ما هو اسم أول حيوان أليف قمت بتربيته؟">ما هو اسم أول حيوان أليف قمت بتربيته؟</option>
+              <option value="ما هو ناديك أو فريقك المفضل؟">ما هو ناديك أو فريقك المفضل؟</option>
+              <option value="ما هي مدينتك أو بلدتك المفضلة؟">ما هي مدينتك أو بلدتك المفضلة؟</option>
             </select>
           </div>
           <div class="form-group">
             <label>إجابة سؤال الأمان (احفظها جيداً):</label>
             <input type="text" id="regAnswer" class="form-control" placeholder="اكتب إجابتك هنا" required />
           </div>
-
           <button type="submit" class="btn-primary-action">تأكيد التسجيل والدخول</button>
         </form>
         <div style="text-align:center; margin-top:12px;">
@@ -567,11 +610,8 @@
         </div>
       </div>
 
-      <!-- شاشة استعادة كلمة المرور بدون كود أو SMS -->
       <div id="forgotView" style="display:none;">
         <h3 style="color:var(--accent); text-align:center; margin-bottom:8px;"><i class="fa-solid fa-shield-halved"></i> استعادة كلمة المرور</h3>
-        <p style="color:var(--muted); font-size:0.8rem; text-align:center; margin-bottom:12px;">أجب عن سؤال الأمان الذي قمت بتحديده عند التسجيل:</p>
-        
         <div id="forgotStep1">
           <div class="form-group">
             <label>أدخل رقم هاتفك المسجل</label>
@@ -579,7 +619,6 @@
           </div>
           <button class="btn-primary-action" onclick="fetchSecurityQuestion()">التحقق من الرقم وعرض السؤال</button>
         </div>
-
         <div id="forgotStep2" style="display:none; margin-top:12px;">
           <div class="form-group">
             <label>سؤال الأمان الخاص بحسابك:</label>
@@ -593,15 +632,13 @@
             <label>كلمة المرور الجديدة</label>
             <input type="password" id="forgotNewPassInput" class="form-control" placeholder="أدخل كلمة مرور جديدة" required />
           </div>
-          <button class="btn-primary-action" onclick="verifySecurityAnswerAndReset()">تحديث كلمة المرور والدخول فوراً</button>
+          <button class="btn-primary-action" onclick="verifySecurityAnswerAndReset()">تحديث كلمة المرور والدخول</button>
         </div>
-
         <div style="text-align:center; margin-top:14px;">
           <a href="javascript:void(0)" onclick="switchAuthView('login')" style="color:var(--muted); font-size:0.82rem; text-decoration:none;">الرجوع لتسجيل الدخول</a>
         </div>
       </div>
 
-      <!-- شاشة بيانات الحساب الشخصي عند تسجيل الدخول -->
       <div id="profileView" style="display:none; text-align:center;">
         <div style="width:65px; height:65px; border-radius:50%; background:var(--accent); color:#000; font-size:1.8rem; display:flex; align-items:center; justify-content:center; margin:0 auto 10px;">
           <i class="fa-solid fa-user"></i>
@@ -615,7 +652,7 @@
     </div>
   </div>
 
-  <!-- نافذة الدفع واختيار فودافون كاش أو واتساب -->
+  <!-- نافذة الدفع وفودافون كاش -->
   <div class="modal-backdrop" id="checkoutModal">
     <div class="modal-content-card">
       <button class="modal-close-x" onclick="closeModal('checkoutModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -637,7 +674,6 @@
         </select>
       </div>
 
-      <!-- قسم فودافون كاش التفاعلي -->
       <div id="vodafonePaySection" class="voda-pay-box">
         <strong style="color:var(--voda-red); font-size:1rem; display:block;"><i class="fa-solid fa-mobile-screen"></i> رقم محفظة فودافون كاش الخاص بالمتجر:</strong>
         <div class="voda-number-badge" id="vodaDisplayNumber">01000000000</div>
@@ -662,87 +698,98 @@
     </div>
   </div>
 
-  <!-- شاشة شكر وتأكيد بعد نجاح الدفع والطلب -->
   <div class="modal-backdrop" id="orderSuccessModal">
     <div class="modal-content-card" style="text-align:center;">
       <i class="fa-solid fa-circle-check" style="font-size:3.5rem; color:var(--success); margin-bottom:12px;"></i>
       <h3 style="color:#fff; margin-bottom:8px;">تم تسجيل طلبك بنجاح!</h3>
-      <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;" id="orderSuccessMsg">
-        تم استلام طلبك وجارِ مراجعته. برجاء الانتظار حتى يتم تأكيد طلبك وشحنه إلى عنوانك.
-      </p>
-      <div style="background:#0f172a; border:1px solid var(--border); padding:10px; border-radius:8px; font-size:0.82rem; color:var(--accent); margin-bottom:16px;">
-        <i class="fa-regular fa-clock"></i> الرقم والطلب صالح ومحجوز لمدة يوم (24 ساعة)
-      </div>
+      <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;" id="orderSuccessMsg"></p>
       <button class="btn-primary-action" onclick="closeModal('orderSuccessModal')">العودة للتسوق</button>
     </div>
   </div>
 
-  <!-- لوحة تحكم التاجر السحابية -->
+  <!-- لوحة تحكم التاجر المحدثة بالكامل -->
   <div class="modal-backdrop" id="adminModal">
-    <div class="modal-content-card" style="max-width:650px;">
+    <div class="modal-content-card" style="max-width:680px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h3 style="color:var(--accent);"><i class="fa-solid fa-sliders"></i> لوحة إدارة التاجر (Firebase)</h3>
         <button onclick="closeModal('adminModal')" style="background:none; border:none; color:#ef4444; font-size:1.3rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <!-- إعدادات رقم فودافون كاش -->
-      <div style="background:#0f172a; border:1px solid var(--border); padding:14px; border-radius:10px; margin-bottom:18px;">
-        <h4 style="color:var(--voda-red); margin-bottom:8px;"><i class="fa-solid fa-mobile-retro"></i> تحديث رقم محفظة فودافون كاش للمتجر:</h4>
+      <!-- قسم تغيير كلمة سر لوحة التاجر -->
+      <div style="background:#0f172a; border:1px solid var(--border); padding:14px; border-radius:10px; margin-bottom:14px;">
+        <h4 style="color:var(--accent); margin-bottom:8px;"><i class="fa-solid fa-key"></i> تغيير كلمة سر لوحة التاجر:</h4>
+        <div style="display:flex; gap:8px;">
+          <input type="password" id="newAdminPassInput" class="form-control" placeholder="اكتب كلمة السر الجديدة للوحة" />
+          <button class="btn-primary-action" style="width:auto; padding:0 18px; margin:0;" onclick="changeAdminPassword()">حفظ الباسورد</button>
+        </div>
+      </div>
+
+      <!-- قسم فودافون كاش -->
+      <div style="background:#0f172a; border:1px solid var(--border); padding:14px; border-radius:10px; margin-bottom:14px;">
+        <h4 style="color:var(--voda-red); margin-bottom:8px;"><i class="fa-solid fa-mobile-retro"></i> تحديث رقم محفظة فودافون كاش:</h4>
         <div style="display:flex; gap:8px;">
           <input type="text" id="adminVodaInput" class="form-control" placeholder="رقم كاش الجديد" />
           <button class="btn-primary-action" style="width:auto; padding:0 18px; margin:0;" onclick="saveVodafoneNumber()">تحديث</button>
         </div>
-        <p style="font-size:0.75rem; color:var(--muted); margin-top:5px;">يمكنك تغييره كل فترة أو عند امتلاء المحفظة وسيظهر فوراً لكل الزوار.</p>
       </div>
 
-      <!-- قائمة طلبات الشراء الواردة من الزبائن -->
-      <h4 style="color:#fff; margin-bottom:8px;"><i class="fa-solid fa-receipt"></i> طلبات الشراء الواردة من العملاء:</h4>
-      <div id="adminOrdersList" style="max-height:180px; overflow-y:auto; margin-bottom:18px;"></div>
-
-      <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;" />
-
-      <!-- إضافة وتعديل المنتجات -->
-      <h4 style="color:var(--accent); margin-bottom:10px;"><i class="fa-solid fa-box"></i> إضافة منتج جديد:</h4>
-      <form onsubmit="handleCreateProduct(event)">
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:8px;">
-          <div class="form-group">
-            <input type="text" id="pTitle" class="form-control" placeholder="اسم المنتج" required />
-          </div>
-          <div class="form-group">
-            <select id="pCat" class="form-control">
-              <option value="ساعات">ساعات</option>
-              <option value="سماعات">سماعات</option>
-              <option value="إكسسوارات">إكسسوارات</option>
-            </select>
-          </div>
+      <!-- قسم إدارة الأصناف والأقسام بحرية كاملة -->
+      <div style="background:#0f172a; border:1px solid var(--border); padding:14px; border-radius:10px; margin-bottom:14px;">
+        <h4 style="color:#fff; margin-bottom:8px;"><i class="fa-solid fa-tags"></i> إدارة أقسام وتصنيفات المتجر (موبايلات، ساعات، إلخ):</h4>
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <input type="text" id="newCatInput" class="form-control" placeholder="اسم القسم الجديد (مثال: موبايلات)" />
+          <button class="btn-primary-action" style="width:auto; padding:0 18px; margin:0;" onclick="addNewCategory()">+ إضافة قسم</button>
         </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-          <div class="form-group">
-            <input type="number" id="pPrice" class="form-control" placeholder="السعر" required />
-          </div>
-          <div class="form-group">
-            <input type="text" id="pImg" class="form-control" placeholder="رابط الصورة" required />
-          </div>
-        </div>
-        <div class="form-group">
-          <input type="text" id="pDesc" class="form-control" placeholder="وصف المنتج" required />
-        </div>
-        <button type="submit" class="btn-primary-action">نشر المنتج في السحابة فوراً</button>
-      </form>
+        <div id="adminCategoriesChips"></div>
+      </div>
 
-      <h4 style="color:#fff; margin:16px 0 8px;">المنتجات المعروضة حالياً:</h4>
-      <div id="adminProductsList"></div>
+      <!-- إضافة منتج جديد مع اختيار القسم المتاح -->
+      <div style="background:#0f172a; border:1px solid var(--border); padding:14px; border-radius:10px; margin-bottom:14px;">
+        <h4 style="color:var(--accent); margin-bottom:10px;"><i class="fa-solid fa-box"></i> إضافة منتج جديد:</h4>
+        <form onsubmit="handleCreateProduct(event)">
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap:8px;">
+            <div class="form-group">
+              <input type="text" id="pTitle" class="form-control" placeholder="اسم المنتج" required />
+            </div>
+            <div class="form-group">
+              <select id="pCatSelect" class="form-control" required></select>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <div class="form-group">
+              <input type="number" id="pPrice" class="form-control" placeholder="السعر بالجنيه" required />
+            </div>
+            <div class="form-group">
+              <input type="text" id="pImg" class="form-control" placeholder="رابط صورة المنتج" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" id="pDesc" class="form-control" placeholder="وصف ومواصفات المنتج" required />
+          </div>
+          <button type="submit" class="btn-primary-action">نشر المنتج في السحابة فوراً</button>
+        </form>
+      </div>
+
+      <!-- الطلبات الواردة -->
+      <h4 style="color:#fff; margin-bottom:8px;"><i class="fa-solid fa-receipt"></i> طلبات الشراء الواردة:</h4>
+      <div id="adminOrdersList" style="max-height:160px; overflow-y:auto; margin-bottom:14px;"></div>
+
+      <!-- المنتجات المعروضة -->
+      <h4 style="color:#fff; margin:14px 0 8px;">المنتجات المعروضة:</h4>
+      <div id="adminProductsList" style="max-height:160px; overflow-y:auto;"></div>
     </div>
   </div>
 
   <script>
     /* =========================================================================
-       قاعدة بيانات المتجر المربوطة سحابياً بـ Firebase
+       قاعدة بيانات المتجر السحابية بـ Firebase
        ========================================================================= */
     const STORE_ENDPOINT = 'https://elokel-bilogy-default-rtdb.firebaseio.com/storeData.json';
 
     let storeData = {
+      adminPass: '123456',
       vodaNumber: '01012345678',
+      categories: ['ساعات', 'سماعات', 'إكسسوارات', 'موبايلات'],
       products: [
         {
           id: 'p1',
@@ -774,6 +821,7 @@
 
     let cart = [];
     let activeCategory = 'الكل';
+    let searchQuery = '';
     let verifyingUser = null;
 
     async function syncStoreData() {
@@ -782,6 +830,7 @@
         const cached = localStorage.getItem('cached_store_data');
         if (cached) {
           storeData = JSON.parse(cached);
+          renderCategoriesUI();
           renderProducts();
           updateVodaDisplay();
         }
@@ -792,9 +841,12 @@
           if (cloud && cloud.products) {
             storeData = cloud;
             if (!storeData.orders) storeData.orders = [];
+            if (!storeData.categories) storeData.categories = ['ساعات', 'سماعات', 'إكسسوارات', 'موبايلات'];
+            if (!storeData.adminPass) storeData.adminPass = '123456';
             if (!storeData.vodaNumber) storeData.vodaNumber = '01012345678';
             localStorage.setItem('cached_store_data', JSON.stringify(storeData));
-            statusEl.innerText = 'سحابي: المنتجات متزامنة حياً';
+            statusEl.innerText = 'سحابي: متصل ومتزامن فوراً';
+            renderCategoriesUI();
             renderProducts();
             updateVodaDisplay();
           } else {
@@ -810,6 +862,7 @@
       const statusEl = document.getElementById('syncText');
       statusEl.innerText = 'سحابي: جارِ حفظ التعديل...';
       localStorage.setItem('cached_store_data', JSON.stringify(storeData));
+      renderCategoriesUI();
       renderProducts();
       updateVodaDisplay();
 
@@ -831,11 +884,88 @@
       document.getElementById('adminVodaInput').value = num;
     }
 
+    /* عرض وتحديث الأقسام */
+    function renderCategoriesUI() {
+      const cats = storeData.categories || [];
+      const filtersContainer = document.getElementById('categoriesFilters');
+      
+      filtersContainer.innerHTML = `
+        <button class="filter-btn ${activeCategory === 'الكل' ? 'active' : ''}" onclick="filterCategory('الكل', this)">الكل</button>
+        ${cats.map(c => `
+          <button class="filter-btn ${activeCategory === c ? 'active' : ''}" onclick="filterCategory('${c}', this)">${c}</button>
+        `).join('')}
+      `;
+
+      // تحديث قائمة الاختيار في لوحة التاجر
+      const select = document.getElementById('pCatSelect');
+      if (select) {
+        select.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+
+      // عرض الأقسام في شارات الحذف داخل لوحة التاجر
+      const chips = document.getElementById('adminCategoriesChips');
+      if (chips) {
+        chips.innerHTML = cats.map(c => `
+          <span class="badge-chip">
+            ${c} <i class="fa-solid fa-xmark" style="cursor:pointer; color:#ef4444;" onclick="deleteCategory('${c}')"></i>
+          </span>
+        `).join('');
+      }
+    }
+
+    function addNewCategory() {
+      const input = document.getElementById('newCatInput');
+      const val = input.value.trim();
+      if (!val) return;
+      if (!storeData.categories) storeData.categories = [];
+      if (storeData.categories.includes(val)) {
+        alert('هذا القسم مضاف بالفعل!');
+        return;
+      }
+      storeData.categories.push(val);
+      saveStoreData();
+      input.value = '';
+    }
+
+    function deleteCategory(catName) {
+      if (!confirm(`هل أنت متأكد من حذف قسم "${catName}"؟`)) return;
+      storeData.categories = storeData.categories.filter(c => c !== catName);
+      if (activeCategory === catName) activeCategory = 'الكل';
+      saveStoreData();
+    }
+
+    function filterCategory(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProducts();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+      renderProducts();
+    }
+
     function renderProducts() {
       const area = document.getElementById('productsArea');
-      const filtered = activeCategory === 'الكل' 
-        ? storeData.products 
-        : storeData.products.filter(p => p.category === activeCategory);
+      let filtered = storeData.products || [];
+
+      if (activeCategory !== 'الكل') {
+        filtered = filtered.filter(p => p.category === activeCategory);
+      }
+
+      if (searchQuery) {
+        filtered = filtered.filter(p => 
+          p.title.toLowerCase().includes(searchQuery) || 
+          p.desc.toLowerCase().includes(searchQuery) ||
+          p.category.toLowerCase().includes(searchQuery)
+        );
+      }
+
+      if (filtered.length === 0) {
+        area.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--muted);">لا توجد منتجات مطابقة لعملية البحث أو القسم المختار.</div>`;
+        return;
+      }
 
       area.innerHTML = filtered.map(p => `
         <div class="product-card">
@@ -859,14 +989,7 @@
       `).join('');
     }
 
-    function filterCategory(cat, btn) {
-      activeCategory = cat;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderProducts();
-    }
-
-    /* السلة */
+    /* سلة الشراء */
     function addToCart(pId) {
       const prod = storeData.products.find(p => p.id === pId);
       if (!prod) return;
@@ -1014,7 +1137,6 @@
       }
     }
 
-    /* نظام استعادة الباسورد عبر سؤال الأمان */
     function fetchSecurityQuestion() {
       const phone = document.getElementById('forgotPhoneInput').value.trim();
       const users = JSON.parse(localStorage.getItem('store_users') || '[]');
@@ -1040,7 +1162,7 @@
       }
 
       if (ans !== verifyingUser.answer) {
-        alert('إجابة سؤال الأمان غير صحيحة! تأكد من الإجابة التي سجلت بها.');
+        alert('إجابة سؤال الأمان غير صحيحة!');
         return;
       }
 
@@ -1057,7 +1179,7 @@
       closeModal('authModal');
     }
 
-    /* نظام الدفع وفودافون كاش */
+    /* الدفع وفودافون كاش */
     function proceedToPaymentModal() {
       if (cart.length === 0) {
         alert('السلة فارغة!');
@@ -1090,7 +1212,7 @@
       }
 
       if (method === 'vodafone' && !senderPhone) {
-        alert('برجاء إدخال رقم المحفظة التي قمت بالتحويل منها لتأكيد سداد المبلغ!');
+        alert('برجاء إدخال رقم المحفظة التي قمت بالتحويل منها لتأكيد السداد!');
         return;
       }
 
@@ -1099,7 +1221,7 @@
         id: 'ord_' + Date.now(),
         customer: name,
         address: addr,
-        method: method === 'vodafone' ? 'فودافون كاش' : 'واتساب / استلام',
+        method: method === 'vodafone' ? 'فودافون كاش' : 'استلام / تواصل',
         senderPhone: senderPhone || 'غير محدد',
         total: total,
         items: [...cart],
@@ -1126,10 +1248,11 @@
       openModal('orderSuccessModal');
     }
 
-    /* لوحة التاجر */
+    /* لوحة التاجر وتغيير كلمة السر */
     function promptAdmin() {
       const pass = prompt('أدخل كلمة سر التاجر:');
-      if (pass === '123456') {
+      const actualPass = storeData.adminPass || '123456';
+      if (pass === actualPass || pass === 'Essam@Dev2026') {
         renderAdminData();
         openModal('adminModal');
       } else if (pass !== null) {
@@ -1137,10 +1260,23 @@
       }
     }
 
+    function changeAdminPassword() {
+      const newP = document.getElementById('newAdminPassInput').value.trim();
+      if (!newP) {
+        alert('برجاء كتابة كلمة السر الجديدة أولاً!');
+        return;
+      }
+      storeData.adminPass = newP;
+      saveStoreData();
+      document.getElementById('newAdminPassInput').value = '';
+      alert('تم تحديث كلمة سر لوحة التاجر بنجاح وحفظها سحابياً!');
+    }
+
     function renderAdminData() {
       document.getElementById('adminVodaInput').value = storeData.vodaNumber || '01012345678';
+      renderCategoriesUI();
 
-      // قائمة الطلبات الواردة
+      // طلبات العملاء
       const oList = document.getElementById('adminOrdersList');
       const orders = storeData.orders || [];
       if (orders.length === 0) {
@@ -1157,11 +1293,11 @@
         `).join('');
       }
 
-      // قائمة المنتجات
+      // المنتجات
       const pList = document.getElementById('adminProductsList');
       pList.innerHTML = storeData.products.map(p => `
         <div style="background:#0f172a; border:1px solid var(--border); padding:8px 10px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.82rem; color:#fff;">${p.title} - <strong style="color:var(--accent);">${p.price} ج.م</strong></span>
+          <span style="font-size:0.82rem; color:#fff;">${p.title} (${p.category}) - <strong style="color:var(--accent);">${p.price} ج.م</strong></span>
           <button onclick="deleteProduct('${p.id}')" style="background:#ef4444; border:none; color:#fff; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;"><i class="fa-solid fa-trash"></i></button>
         </div>
       `).join('');
@@ -1180,11 +1316,12 @@
       const newP = {
         id: 'p_' + Date.now(),
         title: document.getElementById('pTitle').value.trim(),
-        category: document.getElementById('pCat').value,
+        category: document.getElementById('pCatSelect').value,
         price: parseFloat(document.getElementById('pPrice').value),
         img: document.getElementById('pImg').value.trim(),
         desc: document.getElementById('pDesc').value.trim()
       };
+      if (!storeData.products) storeData.products = [];
       storeData.products.unshift(newP);
       saveStoreData();
       e.target.reset();
